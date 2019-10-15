@@ -1,0 +1,1 @@
+# appmesh-kustomize-sidecar-test
