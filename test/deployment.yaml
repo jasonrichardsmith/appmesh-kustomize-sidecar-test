@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: podinfo
+  annotations:
+    appmesh-sidecar: "true"
+  labels:
+    app: podinfo
+  namespace: flagger-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: podinfo
+  template:
+    metadata:
+      labels:
+        app: podinfo
+    spec:
+      containers:
+      - command:
+        - ./podinfo
+        - --port=9898
+        - --level=info
+        image: stefanprodan/podinfo:3.1.0
+        imagePullPolicy: IfNotPresent
+        name: podinfo
+        ports:
+        - containerPort: 9898
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "2"
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi

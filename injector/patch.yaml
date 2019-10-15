@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: not-important
+spec:
+  template:
+    spec:
+      containers:
+      - env:
+        - name: APPMESH_VIRTUAL_NODE_NAME
+          value: mesh/mymesh/virtualNode/podinfo-flagger-test
+        - name: ENVOY_LOG_LEVEL
+          value: debug
+        - name: AWS_REGION
+          value: test
+        image: 840364872350.dkr.ecr.us-west-2.amazonaws.com/aws-appmesh-envoy:v1.11.2.0-prod
+        imagePullPolicy: IfNotPresent
+        name: envoy
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          runAsUser: 1337
+      initContainers:
+      - env:
+        - name: APPMESH_START_ENABLED
+          value: "1"
+        - name: APPMESH_IGNORE_UID
+          value: "1337"
+        - name: APPMESH_ENVOY_INGRESS_PORT
+          value: "15000"
+        - name: APPMESH_ENVOY_EGRESS_PORT
+          value: "15001"
+        - name: APPMESH_APP_PORTS
+          value: "9898"
+        - name: APPMESH_EGRESS_IGNORED_IP
+          value: 169.254.169.254
+        - name: APPMESH_EGRESS_IGNORED_PORTS
+          value: "22"
+        image: 111345817488.dkr.ecr.us-west-2.amazonaws.com/aws-appmesh-proxy-route-manager:v2
+        imagePullPolicy: IfNotPresent
+        name: proxyinit
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
